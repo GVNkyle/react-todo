@@ -1,15 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TodoItem from './TodoItem';
 import AddTodo from './AddTodo';
+import axios from "axios";
+
+const api = axios.create({
+    baseURL: "http://localhost:3000/todos"
+});
 
 const TodoList = () => {
-    const [todos,setTodos] = useState([]);
+    const [todos, setTodos] = useState([]);
 
-    const addTodo = todo => {
-        if(!todo.text || /^\s*$/.test(todo.text) || todos.some(x => x.id === todo.id)) {
+    useEffect(() => {
+        api.get().then((response) => setTodos(response.data));
+    }, []);
+
+    const addTodo = (todo) => {
+        if (!todo.text || /^\s*$/.test(todo.text) || todos.some(x => x.id === todo.id)) {
             return
         }
-        setTodos([todo,...todos]);        
+        api.post('', {
+            ...todo
+        }).then((response) => {
+            const newTodos = [response.data, ...todos]
+            setTodos(newTodos);
+        })
     };
 
 
@@ -17,23 +31,33 @@ const TodoList = () => {
         if (!newValue.text || /^\s*$/.test(newValue.text)) {
             return;
         }
-        setTodos(prev => prev.map(item => (item.id === todoId ? newValue : item)));
+        api.put(`${todoId}`, {
+            ...newValue
+        }).then((response) => {
+            const { id, text, isComplete } = response.data;
+            setTodos(prev => prev.map(item => (item.id === id ? { id, text, isComplete } : item)));
+        })
     }
 
-    const removeTodo = id => {
-        const removeArr = [...todos].filter(todo => todo.id !== id)
-
-        setTodos(removeArr);
+    const removeTodo = (id) => {
+        api.delete(`${id}`);
+        setTodos([...todos].filter(todo => todo.id !== id));
     }
 
-    const completeTodo = id => {
-        let updatedTodos = todos.map(todo => {
-            if (todo.id === id) {
-                todo.isComplete = !todo.isComplete;
-            }
-            return todo;
-        });
-        setTodos (updatedTodos);
+    const completeTodo = (id) => {
+        const todo = todos.find(x => x.id === id);
+        api.put(`${id}`, {
+            ...todo,
+            isComplete: !todo.isComplete
+        }).then((response) => {
+            let updatedTodos = todos.map(todo => {
+                if (todo.id === id) {
+                    todo.isComplete = !todo.isComplete;
+                }
+                return todo;
+            });
+            setTodos(updatedTodos);
+        })
     }
 
 

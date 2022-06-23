@@ -9,49 +9,50 @@ const AddTodo = (props) => {
         inputRef.current.focus();
     })
 
-    const handleChange = e => {
+    const handleChange = (e) => {
         setInput(e.target.value)
     }
 
-    const handleSubmit = e => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         props.onSubmit({
             id: Math.floor(Math.random() * 10000),
-            text: input
+            text: input,
+            isComplete: props.edit?.isComplete ?? false
         });
 
         setInput('');
     }
 
-    return(
-    <form onSubmit={handleSubmit} className='todo-form'>
-        {props.edit ? (
-            <>
-                <input placeholder='Update your item' 
-                       onChange={handleChange}
-                       value={input}
-                       name='value'
-                       ref={inputRef}
-                       className='todo-input edit'/>
-                <button onClick={handleSubmit} className='todo-button edit'>
-                    Update
-                </button>
-            </>
-        ) : (
-            <>
-            <input placeholder='Add your item' 
-                       onChange={handleChange}
-                       value={input}
-                       name='value'
-                       ref={inputRef}
-                       className='todo-input'/>
-                <button onClick={handleSubmit} className='todo-button'>
-                Add todo
-                </button>
-            </>
-        )}
+    return (
+        <form onSubmit={handleSubmit} className='todo-form'>
+            {props.edit ? (
+                <>
+                    <input placeholder='Update your item'
+                        onChange={handleChange}
+                        value={input}
+                        name='value'
+                        ref={inputRef}
+                        className='todo-input edit' />
+                    <button onClick={handleSubmit} className='todo-button edit'>
+                        Update
+                    </button>
+                </>
+            ) : (
+                <>
+                    <input placeholder='Add your item'
+                        onChange={handleChange}
+                        value={input}
+                        name='value'
+                        ref={inputRef}
+                        className='todo-input' />
+                    <button onClick={handleSubmit} className='todo-button'>
+                        Add todo
+                    </button>
+                </>
+            )}
 
-    </form>
+        </form>
     )
 }
 

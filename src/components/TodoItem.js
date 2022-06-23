@@ -8,35 +8,36 @@ import AddTodo from './AddTodo'
 const TodoItem = ({ todos, completeTodo, removeTodo, updateTodo }) => {
     const [edit, setEdit] = useState({
         id: null,
-        value: ''
+        value: '',
+        isComplete : false
     });
 
-    const submitUpdate = value => {
+    const submitUpdate = (value) => {
         updateTodo(edit.id, value)
         setEdit({
             id: null,
-            value: ''
+            value: '',
+            isComplete: false
         })
     }
 
-    if (edit.id) {
-        return <AddTodo edit={edit} onSubmit={submitUpdate} />
-    }
-
-    return todos.map((todo, index) => {
-        return (
-            <div key={index} className={todo.isComplete ? 'todo-row complete' : 'todo-row'}>
-                <div key={todo.id}>
-                    {todo.text}
+    return (
+        edit.id ? (<AddTodo edit={edit} onSubmit={submitUpdate} />) : (
+            todos.map((todo, index) =>
+                <div key={index} className={todo?.isComplete ? 'todo-row complete' : 'todo-row'}>
+                    <div key={todo.id}>
+                        {todo.text}
+                    </div>
+                    <div className='icons'>
+                        {todo.isComplete ? (<RiCheckboxLine onClick={() => completeTodo(todo.id)} className='complete-icon' />) :
+                            (<RiCheckboxBlankLine onClick={() => completeTodo(todo.id)} className='complete-icon' />)}
+                        <RiCloseCircleLine onClick={() => removeTodo(todo.id)} className='delete-icon' />
+                        <TiEdit onClick={() => setEdit({ id: todo.id, value: todo.text, isComplete: todo.isComplete })} className='edit-icon'/>
+                    </div>
                 </div>
-                <div className='icons'>
-                    {todo.isComplete ? (<RiCheckboxLine onClick={() => completeTodo(todo.id)} className='complete-icon'/>) : 
-                                       (<RiCheckboxBlankLine onClick={() => completeTodo(todo.id)} className='complete-icon'/>)}
-                    <RiCloseCircleLine onClick={() => removeTodo(todo.id)} className='delete-icon' />
-                    <TiEdit onClick={() => setEdit({ id: todo.id, value: todo.text })} className='edit-icon' />
-                </div>
-            </div>)
-    });
+            )
+        )
+    )
 }
 
 export default TodoItem
